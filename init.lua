@@ -126,6 +126,18 @@ require("lazy").setup({
           model = "open-r1/olympiccoder-32b:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
+        openrouter_deepseek_v3_base = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          api_key = vim.env.OPENROUTER_API_KEY,
+          endpoint = "https://openrouter.ai/api/v1/",
+          timeout = 10000,
+          temperature = 0,
+          max_tokens = 5000,
+          model = "deepseek/deepseek-v3-base:free",
+          disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
+        },
+        }
       }
     },
       -- -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
