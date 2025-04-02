@@ -137,7 +137,6 @@ require("lazy").setup({
           model = "deepseek/deepseek-v3-base:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
-        }
       }
     },
       -- -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
