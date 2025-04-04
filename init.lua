@@ -31,7 +31,7 @@ require("lazy").setup({
     opts = {
       -- add any opts here
       -- for example
-      provider = "openrouter_r1",
+      provider = "openrouter_olympicCoder",
       vendors = {
         groq_r1_llama = {
           __inherited_from = "openai",
@@ -73,7 +73,7 @@ require("lazy").setup({
         openrouter_qwen_qwq = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
@@ -84,7 +84,7 @@ require("lazy").setup({
         openrouter_qwen_coder = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
@@ -95,7 +95,7 @@ require("lazy").setup({
         openrouter_r1_qwen = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
@@ -118,7 +118,7 @@ require("lazy").setup({
         openrouter_olympicCoder = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
@@ -126,7 +126,7 @@ require("lazy").setup({
           model = "open-r1/olympiccoder-32b:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
-        openrouter_deepseek_v3_base = {
+        openrouter_deepseek_v3= {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           api_key = vim.env.OPENROUTER_API_KEY,
@@ -134,7 +134,7 @@ require("lazy").setup({
           timeout = 10000,
           temperature = 0,
           -- max_tokens = 5000,
-          model = "deepseek/deepseek-v3-base:free",
+          model = "deepseek/deepseek-chat-v3-0324:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
       }
