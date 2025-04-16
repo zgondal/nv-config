@@ -10,7 +10,7 @@ map("i", "jk", "<ESC>")
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 
 
-local function map(mode, lhs, rhs, opts)
+local function avantemap(mode, lhs, rhs, opts)
   local options = { noremap = true, silent = true }
   if opts then
     options = vim.tbl_extend("force", options, opts)
@@ -19,14 +19,19 @@ local function map(mode, lhs, rhs, opts)
 end
 
 -- Keybindings for avante.nvim
-map("n", "<leader>ap", function()
+avantemap("n", "<leader>ap", function()
   require("avante").toggle() -- Toggle Planning Mode (sidebar)
 end, { desc = "avante: toggle planning mode" })
 
-map("v", "<leader>ae", function()
+avantemap("v", "<leader>ae", function()
   require("avante").edit() -- Enter Editing Mode (on selected code block)
 end, { desc = "avante: edit selection" })
 
-map("n", "<leader>ak", function()
+avantemap("n", "<leader>ak", function()
   require("avante").toggle() -- Toggle Cursor-Planning Mode (Tab flow)
 end, { desc = "avante: toggle cursor-planning mode" })
+
+
+-- My custom mappings
+map({ "n", "v", "i" }, "<C>l", "$", { desc = "Move to end of line" })
+map({ "n", "v", "i" }, "<C>h", "^", { desc = "Move to first non-blank character" })
