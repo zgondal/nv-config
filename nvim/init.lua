@@ -25,18 +25,19 @@ require("lazy").setup({
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
-    lazy = false,
+    lazy = true,
     version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
     lock = true,
     opts = {
       -- add any opts here
       -- for example
-      provider = "openrouter_r1",
+      provider = "openrouter_deepseek_v3",
       vendors = {
         groq_r1_llama = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
           -- api_key = os.getenv("GROQ_API_KEY"),
+          api_key = vim.env.GROQ_API_KEY,
           endpoint = "https://api.groq.com/openai/v1/",
           timeout = 10000,
           temperature = 0,
@@ -47,6 +48,7 @@ require("lazy").setup({
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
           -- api_key = os.getenv("GROQ_API_KEY"),
+          api_key = vim.env.GROQ_API_KEY,
           endpoint = "https://api.groq.com/openai/v1/",
           timeout = 10000,
           temperature = 0,
@@ -59,6 +61,7 @@ require("lazy").setup({
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
           -- api_key = os.getenv("GROQ_API_KEY"),
+          api_key = vim.env.GROQ_API_KEY,
           endpoint = "https://api.groq.com/openai/v1/",
           timeout = 10000,
           temperature = 0,
@@ -70,40 +73,40 @@ require("lazy").setup({
         openrouter_qwen_qwq = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
-          max_tokens = 5000,
+          -- max_tokens = 10000,
           model = "qwen/qwq-32b:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
         openrouter_qwen_coder = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
-          max_tokens = 5000,
+          -- max_tokens = 5000,
           model = "qwen/qwen-2.5-coder-32b-instruct:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
         openrouter_r1_qwen = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
-          max_tokens = 5000,
+          -- max_tokens = 5000,
           model = "deepseek/deepseek-r1-distill-qwen-32b:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
         openrouter_r1 = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
@@ -111,16 +114,27 @@ require("lazy").setup({
           model = "deepseek/deepseek-r1:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
         },
-        openrouter_olympicCoder = {
+        openrouter_deepseek_v3= {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
-          api_key = os.getenv("OPENROUTER_API_KEY"),
+          api_key = vim.env.OPENROUTER_API_KEY,
           endpoint = "https://openrouter.ai/api/v1/",
           timeout = 10000,
           temperature = 0,
           -- max_tokens = 5000,
-          model = "open-r1/olympiccoder-32b:free",
+          model = "deepseek/deepseek-chat-v3-0324:free",
           disable_tools = { "code_runner", "file_selector", "git_diff", "git_status", "history", "image_paste", "repo_map", "search", "spell_check", "terminal", "text_diff", "web_search" },
+        },
+        openrouter_gemini_2_5_pro = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          api_key = vim.env.OPENROUTER_API_KEY,
+          endpoint = "https://openrouter.ai/api/v1/",
+          timeout = 10000,
+          temperature = 0,
+          -- max_tokens = 5000,
+          model = "google/gemini-2.5-pro-exp-03-25:free",
+          disable_tools = true,
         },
       }
     },
@@ -172,37 +186,35 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
       --- The below dependencies are optional,
-      "echasnovski/mini.pick", -- for file_selector provider mini.pick
-      "nvim-telescope/telescope.nvim",
+      -- "echasnovski/mini.pick", -- for file_selector provider mini.pick
+      {
+        "nvim-telescope/telescope.nvim",
+        cmd = "Telescope",
+        config = function()
+          require("custom.configs.telescope").setup()
+        end,
+      },
       "ibhagwan/fzf-lua", -- for file_selector provider fzf
-      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-      "zbirenbaum/copilot.lua", -- for providers='copilot'
-      {
-        -- support for image pasting
-        "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
-        opts = {
-          -- recommended settings
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            -- required for Windows users
-            use_absolute_path = true,
+      -- "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      -- "zbirenbaum/copilot.lua", -- for providers='copilot'
+      -- {
+      --   -- support for image pasting
+      --   "HakonHarnes/img-clip.nvim",
+      --   event = "VeryLazy",
+      --   opts = {
+      --     -- recommended settings
+      --     default = {
+      --       embed_image_as_base64 = false,
+      --       prompt_for_file_name = false,
+      --       drag_and_drop = {
+      --         insert_mode = true,
+      --       },
+      --       -- required for Windows users
+      --       use_absolute_path = true,
+      --     },
+      --   },
+      -- },
           },
-        },
-      },
-      {
-        -- Make sure to set this up properly if you have lazy=true
-        'MeanderingProgrammer/render-markdown.nvim',
-        opts = {
-          file_types = { "markdown", "Avante" },
-        },
-        ft = { "markdown", "Avante" },
-      },
-    },
   },
   {
     'mrcjkb/rustaceanvim',
@@ -216,9 +228,13 @@ require("lazy").setup({
   {
     "supermaven-inc/supermaven-nvim",
     config = function()
-      require("supermaven-nvim").setup({})
+      require("supermaven-nvim").setup({
+        color = {
+          suggestion_color = "#ff00ff",
+        },
+      })
     end,
-    lazy = false,
+     lazy = false,
   },
   {
     "williamboman/mason.nvim",
@@ -227,25 +243,25 @@ require("lazy").setup({
       require("mason").setup()
       require("mason-lspconfig").setup({
         ensure_installed = {
-        	"rust_analyzer",  -- For Rust
-        	"ts_ls",       -- For JavaScript/TypeScript
-          "jdtls",          -- For Java
-          "pyright",         -- For Python
-          "bashls",          -- For bash
-          "dockerls",        -- For docker
-          "yamlls",          -- For yaml
-          "jsonls",          -- For json
-          "html",            -- For html
-          "cssls",           -- For css
-          "eslint",          -- For javascript
-          "taplo",           -- For toml
-          "sqlls",           -- For sql
-          "postgres",        -- For postgres
-          "svelte",          -- For svelte
-          "graphql",         -- For graphql
-          "tailwindcss",     -- For tailwindcss
-          "solidity",        -- For solidity
-          "efm",             -- For efm
+        	"rust_analyzer",  -- for rust
+        	"ts_ls",       -- for javascript/typescript
+          "jdtls",          -- for java
+          "pyright",         -- for python
+          "bashls",          -- for bash
+          "dockerls",        -- for docker
+          "yamlls",          -- for yaml
+          "jsonls",          -- for json
+          "html",            -- for html
+          "cssls",           -- for css
+          "eslint",          -- for javascript
+          "taplo",           -- for toml
+          "sqlls",           -- for sql
+          "postgres",        -- for postgres
+          "svelte",          -- for svelte
+          "graphql",         -- for graphql
+          "tailwindcss",     -- for tailwindcss
+          "solidity",        -- for solidity
+          "efm",             -- for efm
         }
       })
     end
@@ -257,34 +273,34 @@ require("lazy").setup({
     config = true,
   },
   {
-    "CRAG666/code_runner.nvim",
+    "crag666/code_runner.nvim",
     lazy = false,
     config = function()
       require("code_runner").setup({
         filetype = {
         java = {
           "cd $dir &&",
-          "javac $fileName &&",
-          "java $fileNameWithoutExt"
+          "javac $filename &&",
+          "java $filenamewithoutext"
         },
         python = "python3 -u",
         typescript = "deno run",
         rust = {
           "cd $dir &&",
-          "rustc $fileName &&",
-          "$dir/$fileNameWithoutExt"
+          "rustc $filename &&",
+          "$dir/$filenamewithoutext"
         },
         c = function(...)
           c_base = {
             "cd $dir &&",
-            "gcc $fileName -o",
-            "/tmp/$fileNameWithoutExt",
+            "gcc $filename -o",
+            "/tmp/$filenamewithoutext",
           }
           local c_exec = {
-            "&& /tmp/$fileNameWithoutExt &&",
-            "rm /tmp/$fileNameWithoutExt",
+            "&& /tmp/$filenamewithoutext &&",
+            "rm /tmp/$filenamewithoutext",
           }
-          vim.ui.input({ prompt = "Add more args:" }, function(input)
+          vim.ui.input({ prompt = "add more args:" }, function(input)
             c_base[4] = input
             vim.print(vim.tbl_extend("force", c_base, c_exec))
             require("code_runner.commands").run_from_fn(vim.list_extend(c_base, c_exec))
@@ -292,13 +308,13 @@ require("lazy").setup({
         end,
       },
     })
-      vim.keymap.set('n', '<leader>rr', ':RunCode<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>rf', ':RunFile<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>rft', ':RunFile tab<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>rp', ':RunProject<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>rc', ':RunClose<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>crf', ':CRFiletype<CR>', { noremap = true, silent = false })
-      vim.keymap.set('n', '<leader>crp', ':CRProjects<CR>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>rr', ':runcode<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>rf', ':runfile<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>rft', ':runfile tab<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>rp', ':runproject<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>rc', ':runclose<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>crf', ':crfiletype<cr>', { noremap = true, silent = false })
+      vim.keymap.set('n', '<leader>crp', ':crprojects<cr>', { noremap = true, silent = false })
     end
   },
   {
@@ -306,8 +322,8 @@ require("lazy").setup({
     lazy = false,
     config = function()
       require("stay-centered").setup({
-        -- The default is to stay centered when the cursor moves to a new line.
-        -- If you want to stay centered when the cursor moves to a new window,
+        -- the default is to stay centered when the cursor moves to a new line.
+        -- if you want to stay centered when the cursor moves to a new window,
         -- set this to true.
         stay_centered_on_new_window = false,
       })
@@ -316,61 +332,79 @@ require("lazy").setup({
   {
     'rmagatti/auto-session',
     lazy = false,
+    priority = 1000,
     ---@module "auto-session"
-    ---@type AutoSession.Config
+    ---@type autosession.config
     opts = {
       -- default options here
-      suppressed_dirs = { '~/', '~/Downloads' },
+      -- suppressed_dirs = { '~/', '~/downloads' },
       -- log_level = 'debug',
       sessionoptions = { "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal", "options" },
     },
   },
   {
-    "NvChad/nvim-colorizer.lua",
+    "nvchad/nvim-colorizer.lua",
     lazy = false,
     priority = 1000,
   },
   {
-    "nvim-tree/nvim-web-devicons",
+    -- make sure to set this up properly if you have lazy=true
+    'meanderingprogrammer/render-markdown.nvim',
+    opts = {
+      file_types = { "markdown", "avante" },
+    },
+    ft = { "markdown", "avante" },
     lazy = false,
-    priority = 1000,
   },
   -- {
-  --   "lukas-reineke/indent-blankline.nvim",
+  --   "michaelb/sniprun",
+  --   branch = "master",
   --   lazy = false,
-  --   priority = 1000,
-  --   main = "ibl",
-  --   ---@module "ibl"
-  --   ---@type ibl.config
+  --   build = "sh install.sh",
+  --   -- do 'sh install.sh 1' if you want to force compile locally
+  --   -- (instead of fetching a binary from the github release). requires rust >= 1.65
+  --
   --   config = function()
-  --     local highlight = {
-  --       "RainbowRed",
-  --       "RainbowYellow",
-  --       "RainbowBlue",
-  --       "RainbowOrange",
-  --       "RainbowGreen",
-  --       "RainbowViolet",
-  --       "RainbowCyan",
-  --     }
-  --     local hooks = require "ibl.hooks"
-  --     -- create the highlight groups in the highlight setup hook, so they are reset
-  --     -- every time the colorscheme changes
-  --     hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-  --       vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
-  --       vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
-  --       vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
-  --       vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
-  --       vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
-  --       vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
-  --       vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
-  --     end)
-  --
-  --     vim.g.rainbow_delimiters = { highlight = highlight }
-  --     require("ibl").setup { scope = { highlight = highlight } }
-  --
-  --     hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
-  --   end
+  --     require("sniprun").setup({
+  --     -- your options
+  --     })
+  --   end,
   -- },
+  -- {
+  --   "akinsho/toggleterm.nvim",
+  --   lazy = false,
+  --   config = function()
+  --     require("toggleterm").setup({
+  --       open_mapping = [[<c-\>]],
+  --       direction = "float",
+  --       float_opts = {
+  --         border = "curved",
+  --         width = function(term)
+  --           return 120
+  --         end,
+  --         height = function(term)
+  --           -- set height to a percentage of your screen
+  --           return math.ceil(vim.o.lines * 0.4 - 1)
+  --         end,
+  --       },
+  --     })
+  --   end,
+  -- },
+  {
+    "nvimdev/dashboard-nvim",
+    lazy = false,
+    event = "VimEnter",
+    config = function()
+      require("custom.configs.dashboard")
+    end,
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons" }
+    }
+  },
+  {
+    "eandrju/cellular-automaton.nvim",
+    lazy = false,
+  },
   { import = "plugins" },
 }, lazy_config)
 
