@@ -48,13 +48,15 @@ local function get_recent_files()
   local oldfiles = vim.v.oldfiles or {}
   local recent_files = {}
   local count = 0
+  local project_root = vim.fn.getcwd()
 
   for _, file in ipairs(oldfiles) do
     -- Filter out non-file entries and system files
-    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 then
+    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 and vim.fn.fnamemodify(file, ":h"):find(project_root, 1, true) == 1 then
       -- Format the filename for display
+      local relative_path = vim.fn.fnamemodify(file, ":~:.")
       local basename = vim.fn.fnamemodify(file, ":t")
-      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(file, ":h"))
+      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(relative_path, ":h"))
 
       -- Create a dashboard-compatible item
       table.insert(recent_files, {
@@ -149,16 +151,6 @@ api.nvim_command("highlight DashboardTerminal guibg=NONE ctermbg=NONE")
 
 -- Create autocommand group for dashboard
 local augroup = api.nvim_create_augroup("CustomDashboard", { clear = true })
-
--- Function to create Telescope files buffer
--- local function create_telescope_files()
---   -- Wait a bit for Telescope to be available
---   vim.defer_fn(function()
---     -- Use our custom telescope configuration
---     local telescope_config = require("custom.configs.telescope")
---     telescope_config.dashboard_oldfiles()
---   end, 300)
--- end
 
 -- Function to display cmatrix when dashboard is shown
 local function on_dashboard_displayed()
