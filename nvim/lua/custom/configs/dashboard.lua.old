@@ -1,0 +1,225 @@
+-- ~/.config/nvim/lua/custom/configs/dashboard.lua
+local dashboard = require("dashboard")
+local api = vim.api
+
+-- Function to create cmatrix terminal window
+local function create_cmatrix_term()
+  local bufnr = api.nvim_create_buf(false, true)
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.43) -- Reduced height to avoid overlapping
+  local row = 1 -- Position at the top of the screen with minimal padding
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  local opts = {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "none",
+  }
+
+  local win_id = api.nvim_open_win(bufnr, true, opts)
+
+  -- Set terminal options
+  api.nvim_win_set_option(win_id, "winhl", "Normal:DashboardTerminal")
+
+  -- Start cmatrix in the terminal
+  -- vim.fn.termopen("cmatrix -b")
+  vim.fn.termopen("rusty-rain -C 0,196,0 -c jap -s")
+  -- vim.fn.termopen("rusty-rain -C 0,199,0 -c alpha-num -S 60,80 -s")
+
+  -- Set the terminal to non-modifiable and disable cursor
+  vim.cmd("setlocal nomodifiable")
+  vim.cmd("setlocal nocursorline")
+  vim.cmd("setlocal nocursorcolumn")
+
+  -- Return to dashboard window
+  vim.cmd("wincmd p")
+
+  return { bufnr = bufnr, win_id = win_id }
+end
+
+-- Store the cmatrix terminal information
+local cmatrix_term = nil
+
+local function get_recent_files()
+  local oldfiles = vim.v.oldfiles or {}
+  local recent_files = {}
+  local count = 0
+
+  for _, file in ipairs(oldfiles) do
+    -- Filter out non-file entries and system files
+    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 then
+      -- Format the filename for display
+      local basename = vim.fn.fnamemodify(file, ":t")
+      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(file, ":h"))
+
+      -- Create a dashboard-compatible item
+      table.insert(recent_files, {
+        icon = "  ",
+        desc = string.format("%-25s (%s)", basename, shortdir),
+        key = #recent_files + 1,
+        action = "edit " .. vim.fn.fnameescape(file)
+      })
+
+      count = count + 1
+      if count >= 6 then break end -- Limit to 6 recent files
+    end
+  end
+
+  return recent_files
+end
+
+-- Setup dashboard with dynamic center section
+dashboard.setup({
+  -- theme = 'doom',
+  config = {
+    header = {
+      "", "", "", "", "", "", "",
+      -- The cmatrix will be displayed above this empty space
+      "", "", "", "", "", "", "", "", "", "", "", "",
+    },
+    -- Create center section with recent files and standard actions
+    center = function()
+      local center_items = {}
+
+      -- Add recent files section
+      local recent_files = get_recent_files()
+
+      if #recent_files > 0 then
+        table.insert(center_items, { icon = "", desc = "════════ Recent Files ════════", key = "" })
+
+        for _, item in ipairs(recent_files) do
+          table.insert(center_items, item)
+        end
+
+        table.insert(center_items, { icon = "", desc = "", key = "" }) -- Spacer
+      end
+
+      -- Add standard actions
+      table.insert(center_items, { icon = "", desc = "════════ Actions ════════", key = "" })
+
+      table.insert(center_items, {
+        icon = "  ",
+        desc = "Find File                      ",
+        key = "f",
+        action = "Telescope find_files"
+      })
+
+      table.insert(center_items, {
+        icon = "  ",
+        desc = "Find Word                      ",
+        key = "g",
+        action = "Telescope live_grep"
+      })
+
+      table.insert(center_items, {
+        icon = "  ",
+        desc = "New File                       ",
+        key = "n",
+        action = "enew"
+      })
+
+      table.insert(center_items, {
+        icon = "  ",
+        desc = "Quit Neovim                    ",
+        key = "q",
+        action = "qa"
+      })
+
+      return center_items
+    end,
+    footer = function()
+      local stats = require("lazy").stats()
+      local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+      return { "⚡ Neovim loaded " .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms .. "ms" }
+    end,
+  },
+  hide = {
+    statusline = false,
+    tabline = false,
+    winbar = false,
+  },
+})
+
+-- Create highlight group for terminal window
+api.nvim_command("highlight DashboardTerminal guibg=NONE ctermbg=NONE")
+
+-- Create autocommand group for dashboard
+local augroup = api.nvim_create_augroup("CustomDashboard", { clear = true })
+
+-- Function to create Telescope files buffer
+-- local function create_telescope_files()
+--   -- Wait a bit for Telescope to be available
+--   vim.defer_fn(function()
+--     -- Use our custom telescope configuration
+--     local telescope_config = require("custom.configs.telescope")
+--     telescope_config.dashboard_oldfiles()
+--   end, 300)
+-- end
+
+-- Function to display cmatrix when dashboard is shown
+local function on_dashboard_displayed()
+  -- Wait a bit to ensure dashboard is fully rendered
+  vim.defer_fn(function()
+    if cmatrix_term then
+      -- Close previous cmatrix if exists
+      pcall(api.nvim_win_close, cmatrix_term.win_id, true)
+      pcall(api.nvim_buf_delete, cmatrix_term.bufnr, { force = true })
+    end
+
+    -- Create new cmatrix terminal
+    cmatrix_term = create_cmatrix_term()
+
+    -- Ensure cmatrix is closed when leaving dashboard
+    api.nvim_create_autocmd("BufLeave", {
+      group = augroup,
+      buffer = api.nvim_get_current_buf(),
+      callback = function()
+        if cmatrix_term then
+          pcall(api.nvim_win_close, cmatrix_term.win_id, true)
+          pcall(api.nvim_buf_delete, cmatrix_term.bufnr, { force = true })
+          cmatrix_term = nil
+        end
+      end,
+      once = true,
+    })
+  end, 100)
+end
+
+-- Set up autocommand to show cmatrix when dashboard is displayed
+api.nvim_create_autocmd("User", {
+  group = augroup,
+  pattern = "DashboardLoaded",
+  callback = on_dashboard_displayed,
+})
+
+-- Create alternative method using the cellular automaton for systems without cmatrix
+api.nvim_create_user_command("DashboardMatrix", function()
+  -- Check if cellular-automaton.nvim is loaded
+  if pcall(require, "cellular-automaton") then
+    vim.cmd("CellularAutomaton make_it_rain")
+  else
+    vim.notify("cellular-automaton.nvim is not installed", vim.log.levels.WARN)
+  end
+end, {})
+
+-- Create a command to refresh the dashboard, cmatrix, and Telescope
+api.nvim_create_user_command("RefreshDashboard", function()
+  -- Close any existing Telescope windows
+  for _, win in ipairs(api.nvim_list_wins()) do
+    local buf = api.nvim_win_get_buf(win)
+    local buf_name = api.nvim_buf_get_name(buf)
+    if buf_name:match(".*Telescope.*") then
+      pcall(api.nvim_win_close, win, true)
+    end
+  end
+
+  -- Reload dashboard
+  vim.cmd("Dashboard")
+
+  -- Trigger cmatrix display and Telescope
+  on_dashboard_displayed()
+end, {})

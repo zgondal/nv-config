@@ -14,31 +14,6 @@ vim.api.nvim_command("highlight DashboardCenter guifg=#88C0D0")
 vim.api.nvim_command("highlight DashboardShortcut guifg=#EBCB8B")
 vim.api.nvim_command("highlight DashboardFooter guifg=#A3BE8C")
 
--- Dashboard layout configuration
--- You can modify these values to adjust the layout
-_G.DashboardConfig = {
-  cmatrix = {
-    height_percent = 0.4,  -- Height as percentage of screen
-    row = 1,               -- Starting row position
-    enabled = true         -- Whether to show cmatrix
-  },
-}
-
--- Function to apply dashboard configuration
-_G.ApplyDashboardConfig = function(config)
-  -- Update global config
-  for section, values in pairs(config) do
-    for key, value in pairs(values) do
-      _G.DashboardConfig[section][key] = value
-    end
-  end
-
-  -- Refresh dashboard to apply changes
-  if vim.fn.exists(":RefreshDashboard") == 2 then
-    vim.cmd("RefreshDashboard")
-  end
-end
-
 -- Add any other custom settings here
 
 -- Add keymaps for the dashboard
@@ -47,6 +22,8 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     -- Map keys for dashboard navigation
     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>r', ':RefreshDashboard<CR>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>f', ':Telescope find_files<CR>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>g', ':Telescope live_grep<CR>', { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':qa<CR>', { noremap = true, silent = true })
   end
 })
