@@ -81,8 +81,9 @@ dashboard.setup({
     week_header = { enable = false },
     packages = { enable = false },   -- Disable package updates
     project = { enable = false },    -- Disable project stats
-    mru = { enable = true },        -- Disable default recent files
-    shortcut_type = { 'number' },
+    mru = { enable = true, cwd_only = true },        -- Disable default recent files
+    shortcut = {},
+    shortcut_type = 'number',
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
@@ -206,15 +207,7 @@ api.nvim_create_autocmd("User", {
   callback = on_dashboard_displayed,
 })
 
--- Create alternative method using the cellular automaton for systems without cmatrix
-api.nvim_create_user_command("DashboardMatrix", function()
-  -- Check if cellular-automaton.nvim is loaded
-  if pcall(require, "cellular-automaton") then
-    vim.cmd("CellularAutomaton make_it_rain")
-  else
-    vim.notify("cellular-automaton.nvim is not installed", vim.log.levels.WARN)
-  end
-end, {})
+-- TODO: Create autocommand to exit dashboard and restore last session
 
 -- Create a command to refresh the dashboard, cmatrix, and Telescope
 api.nvim_create_user_command("RefreshDashboard", function()
