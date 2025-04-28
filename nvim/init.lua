@@ -340,6 +340,9 @@ require("lazy").setup({
       -- suppressed_dirs = { '~/', '~/downloads' },
       -- log_level = 'debug',
       sessionoptions = { "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal", "options" },
+      auto_restore_last_session = false,
+      auto_restore = false,
+      auto_delete_empty_sessions = true,
     },
   },
   {

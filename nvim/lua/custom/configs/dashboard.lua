@@ -76,8 +76,13 @@ end
 
 -- Setup dashboard with dynamic center section
 dashboard.setup({
-  -- theme = 'doom',
+  theme = 'hyper',
   config = {
+    week_header = { enable = false },
+    packages = { enable = false },   -- Disable package updates
+    project = { enable = false },    -- Disable project stats
+    mru = { enable = true },        -- Disable default recent files
+    shortcut_type = { 'number' },
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
@@ -86,53 +91,66 @@ dashboard.setup({
     -- Create center section with recent files and standard actions
     center = function()
       local center_items = {}
-
-      -- Add recent files section
       local recent_files = get_recent_files()
 
+      -- Recent Files Section
       if #recent_files > 0 then
-        table.insert(center_items, { icon = "", desc = "════════ Recent Files ════════", key = "" })
+        table.insert(center_items, { 
+          icon = " ",
+          desc = "Recent Files in " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~"),
+          key = "R",
+          action = "lua require('telescope.builtin').oldfiles()"
+        })
 
         for _, item in ipairs(recent_files) do
           table.insert(center_items, item)
         end
 
-        table.insert(center_items, { icon = "", desc = "", key = "" }) -- Spacer
+        table.insert(center_items, { icon = "", desc = "", key = "" })
       end
 
-      -- Add standard actions
-      table.insert(center_items, { icon = "", desc = "════════ Actions ════════", key = "" })
+      -- Standard Actions
+      local actions = {
+        {
+          icon = " ",
+          desc = "Find File                      ",
+          key = "F",
+          action = "lua require('telescope.builtin').find_files()"
+        },
+        {
+          icon = " ",
+          desc = "Find Text                      ",
+          key = "G",
+          action = "lua require('telescope.builtin').live_grep()"
+        },
+        {
+          icon = " ",
+          desc = "New File                       ",
+          key = "N",
+          action = "enew"
+        },
+        {
+          icon = " ",
+          desc = "Quit Neovim                    ",
+          key = "Q",
+          action = "qa"
+        }
+      }
 
       table.insert(center_items, {
-        icon = "  ",
-        desc = "Find File                      ",
-        key = "f",
-        action = "Telescope find_files"
+        icon = " ",
+        desc = "Workspace Actions",
+        key = "A",
+        action = ""
       })
 
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "Find Word                      ",
-        key = "g",
-        action = "Telescope live_grep"
-      })
-
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "New File                       ",
-        key = "n",
-        action = "enew"
-      })
-
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "Quit Neovim                    ",
-        key = "q",
-        action = "qa"
-      })
+      for _, action in ipairs(actions) do
+        table.insert(center_items, action)
+      end
 
       return center_items
     end,
+
     footer = function()
       local stats = require("lazy").stats()
       local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)

@@ -27,7 +27,7 @@ local function create_cmatrix_term()
 
   -- Start cmatrix in the terminal
   -- vim.fn.termopen("cmatrix -b")
-  vim.fn.termopen("rusty-rain -C 0,196,0 -c jap -s")
+  vim.fn.termopen("rusty-rain -C 0,212,0 -c jap -s")
   -- vim.fn.termopen("rusty-rain -C 0,199,0 -c alpha-num -S 60,80 -s")
 
   -- Set the terminal to non-modifiable and disable cursor
@@ -48,13 +48,15 @@ local function get_recent_files()
   local oldfiles = vim.v.oldfiles or {}
   local recent_files = {}
   local count = 0
+  local project_root = vim.fn.getcwd()
 
   for _, file in ipairs(oldfiles) do
     -- Filter out non-file entries and system files
-    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 then
+    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 and vim.fn.fnamemodify(file, ":h"):find(project_root, 1, true) == 1 then
       -- Format the filename for display
+      local relative_path = vim.fn.fnamemodify(file, ":~:.")
       local basename = vim.fn.fnamemodify(file, ":t")
-      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(file, ":h"))
+      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(relative_path, ":h"))
 
       -- Create a dashboard-compatible item
       table.insert(recent_files, {
@@ -74,8 +76,13 @@ end
 
 -- Setup dashboard with dynamic center section
 dashboard.setup({
-  -- theme = 'doom',
+  theme = 'hyper',
   config = {
+    week_header = { enable = false },
+    packages = { enable = false },   -- Disable package updates
+    project = { enable = false },    -- Disable project stats
+    mru = { enable = true },        -- Disable default recent files
+    shortcut = {},
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
@@ -84,53 +91,66 @@ dashboard.setup({
     -- Create center section with recent files and standard actions
     center = function()
       local center_items = {}
-
-      -- Add recent files section
       local recent_files = get_recent_files()
 
+      -- Recent Files Section
       if #recent_files > 0 then
-        table.insert(center_items, { icon = "", desc = "════════ Recent Files ════════", key = "" })
+        table.insert(center_items, { 
+          icon = " ",
+          desc = "Recent Files in " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~"),
+          key = "R",
+          action = "lua require('telescope.builtin').oldfiles()"
+        })
 
         for _, item in ipairs(recent_files) do
           table.insert(center_items, item)
         end
 
-        table.insert(center_items, { icon = "", desc = "", key = "" }) -- Spacer
+        table.insert(center_items, { icon = "", desc = "", key = "" })
       end
 
-      -- Add standard actions
-      table.insert(center_items, { icon = "", desc = "════════ Actions ════════", key = "" })
+      -- Standard Actions
+      local actions = {
+        {
+          icon = " ",
+          desc = "Find File                      ",
+          key = "F",
+          action = "lua require('telescope.builtin').find_files()"
+        },
+        {
+          icon = " ",
+          desc = "Find Text                      ",
+          key = "G",
+          action = "lua require('telescope.builtin').live_grep()"
+        },
+        {
+          icon = " ",
+          desc = "New File                       ",
+          key = "N",
+          action = "enew"
+        },
+        {
+          icon = " ",
+          desc = "Quit Neovim                    ",
+          key = "Q",
+          action = "qa"
+        }
+      }
 
       table.insert(center_items, {
-        icon = "  ",
-        desc = "Find File                      ",
-        key = "f",
-        action = "Telescope find_files"
+        icon = " ",
+        desc = "Workspace Actions",
+        key = "A",
+        action = ""
       })
 
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "Find Word                      ",
-        key = "g",
-        action = "Telescope live_grep"
-      })
-
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "New File                       ",
-        key = "n",
-        action = "enew"
-      })
-
-      table.insert(center_items, {
-        icon = "  ",
-        desc = "Quit Neovim                    ",
-        key = "q",
-        action = "qa"
-      })
+      for _, action in ipairs(actions) do
+        table.insert(center_items, action)
+      end
 
       return center_items
     end,
+
     footer = function()
       local stats = require("lazy").stats()
       local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
@@ -149,16 +169,6 @@ api.nvim_command("highlight DashboardTerminal guibg=NONE ctermbg=NONE")
 
 -- Create autocommand group for dashboard
 local augroup = api.nvim_create_augroup("CustomDashboard", { clear = true })
-
--- Function to create Telescope files buffer
--- local function create_telescope_files()
---   -- Wait a bit for Telescope to be available
---   vim.defer_fn(function()
---     -- Use our custom telescope configuration
---     local telescope_config = require("custom.configs.telescope")
---     telescope_config.dashboard_oldfiles()
---   end, 300)
--- end
 
 -- Function to display cmatrix when dashboard is shown
 local function on_dashboard_displayed()
