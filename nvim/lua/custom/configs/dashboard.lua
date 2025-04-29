@@ -207,8 +207,6 @@ api.nvim_create_autocmd("User", {
   callback = on_dashboard_displayed,
 })
 
--- TODO: Create autocommand to exit dashboard and restore last session
-
 -- Create a command to refresh the dashboard, cmatrix, and Telescope
 api.nvim_create_user_command("RefreshDashboard", function()
   -- Close any existing Telescope windows
@@ -226,3 +224,6 @@ api.nvim_create_user_command("RefreshDashboard", function()
   -- Trigger cmatrix display and Telescope
   on_dashboard_displayed()
 end, {})
+
+-- Add keymap to load session
+vim.api.nvim_buf_set_keymap(0, 'n', 's', ':SessionRestore<CR>', { noremap = true, silent = true })
