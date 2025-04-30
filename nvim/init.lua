@@ -337,7 +337,6 @@ require("lazy").setup({
       -- suppressed_dirs = { '~/', '~/downloads' },
       -- log_level = 'debug',
       sessionoptions = { "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal", "options" },
-      auto_restore_last_session = false,
       auto_restore = false,
       auto_delete_empty_sessions = true,
     },
@@ -367,26 +366,6 @@ require("lazy").setup({
   --   config = function()
   --     require("sniprun").setup({
   --     -- your options
-  --     })
-  --   end,
-  -- },
-  -- {
-  --   "akinsho/toggleterm.nvim",
-  --   lazy = false,
-  --   config = function()
-  --     require("toggleterm").setup({
-  --       open_mapping = [[<c-\>]],
-  --       direction = "float",
-  --       float_opts = {
-  --         border = "curved",
-  --         width = function(term)
-  --           return 120
-  --         end,
-  --         height = function(term)
-  --           -- set height to a percentage of your screen
-  --           return math.ceil(vim.o.lines * 0.4 - 1)
-  --         end,
-  --       },
   --     })
   --   end,
   -- },
@@ -425,3 +404,10 @@ vim.opt.clipboard = "unnamedplus"
 vim.schedule(function()
   require "mappings"
 end)
+
+-- vim.api.nvim_create_autocmd("User", {
+--   pattern = "ToggleMyPrompt",
+--   callback = function() require("avante.config").override({ system_prompt = require("custom.system_prompt.avanterules") }) end,
+-- })
+--
+-- vim.keymap.set("n", "<leader>am", function() vim.api.nvim_exec_autocmds("User", {pattern = "ToggleMyPrompt"}) end, { desc = "avante: toggle my prompt"})
