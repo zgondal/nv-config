@@ -190,9 +190,6 @@ require("lazy").setup({
       {
         "nvim-telescope/telescope.nvim",
         cmd = "Telescope",
-        config = function()
-          require("custom.configs.telescope").setup()
-        end,
       },
       "ibhagwan/fzf-lua", -- for file_selector provider fzf
       -- "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
