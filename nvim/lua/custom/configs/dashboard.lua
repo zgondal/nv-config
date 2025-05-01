@@ -76,20 +76,21 @@ end
 
 -- Setup dashboard with dynamic center section
 dashboard.setup({
-  theme = 'doom',
+  theme = 'hyper',
   config = {
     week_header = { enable = false },
     packages = { enable = false },   -- Disable package updates
     project = { enable = false },    -- Disable project stats
-    mru = { enable = false },        -- Disable default recent files
+    mru = { enable = true, cwd_only = true },        -- Disable default recent files
     shortcut = {},
+    shortcut_type = 'number',
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
       "", "", "", "", "", "", "", "", "", "", "", "",
     },
     -- Create center section with recent files and standard actions
-    center = (function()
+    center = function()
       local center_items = {}
       local recent_files = get_recent_files()
 
@@ -103,12 +104,7 @@ dashboard.setup({
         })
 
         for _, item in ipairs(recent_files) do
-          table.insert(center_items, {
-            icon = item.icon,
-            desc = item.desc,
-            key = tostring(item.key),  -- Ensure key is a string
-            action = item.action,
-          })
+          table.insert(center_items, item)
         end
 
         table.insert(center_items, { icon = "", desc = "", key = "" })
@@ -142,12 +138,19 @@ dashboard.setup({
         }
       }
 
+      table.insert(center_items, {
+        icon = " ",
+        desc = "Workspace Actions",
+        key = "A",
+        action = ""
+      })
+
       for _, action in ipairs(actions) do
         table.insert(center_items, action)
       end
 
       return center_items
-    end)(), -- Immediately generate center itemscenter = function()
+    end,
 
     footer = function()
       local stats = require("lazy").stats()
@@ -204,16 +207,6 @@ api.nvim_create_autocmd("User", {
   callback = on_dashboard_displayed,
 })
 
--- Create alternative method using the cellular automaton for systems without cmatrix
-api.nvim_create_user_command("DashboardMatrix", function()
-  -- Check if cellular-automaton.nvim is loaded
-  if pcall(require, "cellular-automaton") then
-    vim.cmd("CellularAutomaton make_it_rain")
-  else
-    vim.notify("cellular-automaton.nvim is not installed", vim.log.levels.WARN)
-  end
-end, {})
-
 -- Create a command to refresh the dashboard, cmatrix, and Telescope
 api.nvim_create_user_command("RefreshDashboard", function()
   -- Close any existing Telescope windows
@@ -232,4 +225,5 @@ api.nvim_create_user_command("RefreshDashboard", function()
   on_dashboard_displayed()
 end, {})
 
-vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sr', ':SessionRestore<CR>', {noremap = true, silent = true})
+-- Add keymap to load session
+vim.api.nvim_buf_set_keymap(0, 'n', 'sr', ':SessionRestore<CR>', { noremap = true, silent = true })

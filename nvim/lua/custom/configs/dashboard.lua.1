@@ -231,3 +231,5 @@ api.nvim_create_user_command("RefreshDashboard", function()
   -- Trigger cmatrix display and Telescope
   on_dashboard_displayed()
 end, {})
+
+vim.api.nvim_buf_set_keymap(0, 'n', 'sr', ':SessionRestore<CR>', { noremap = true, silent = true })
