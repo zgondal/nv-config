@@ -27,7 +27,7 @@ local function create_cmatrix_term()
 
   -- Start cmatrix in the terminal
   -- vim.fn.termopen("cmatrix -b")
-  vim.fn.termopen("rusty-rain -C 0,212,0 -c jap -s")
+  vim.fn.termopen("rusty-rain -C 0,249,0 -c jap -s")
   -- vim.fn.termopen("rusty-rain -C 0,199,0 -c alpha-num -S 60,80 -s")
 
   -- Set the terminal to non-modifiable and disable cursor
@@ -46,46 +46,21 @@ local cmatrix_term = nil
 
 -- Setup dashboard with dynamic center section
 dashboard.setup({
-  theme = 'doom',
+  theme = 'hyper',
   config = {
-    -- shortcut = {},
+    week_header = { enable = false },
+    packages = { enable = false },   -- Disable package updates
+    project = { enable = false },    -- Disable project stats
+    mru = { enable = true, cwd_only = true },        -- Disable default recent files
+    shortcut = {},
+    shortcut_type = { 'number' },
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
       "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "",
     },
-       center = {
-      {
-        icon = "  ",
-        desc = "Open Recent Files              ",
-        key = "r",
-        action = "Telescope oldfiles"
-      },
-      {
-        icon = "  ",
-        desc = "Find File                      ",
-        key = "f",
-        action = "Telescope find_files"
-      },
-      {
-        icon = "  ",
-        desc = "Find Word                      ",
-        key = "g",
-        action = "Telescope live_grep"
-      },
-      {
-        icon = "  ",
-        desc = "New File                       ",
-        key = "n",
-        action = "enew"
-      },
-      {
-        icon = "  ",
-        desc = "Quit Neovim                    ",
-        key = "q",
-        action = "qa"
-      },
-    },
+
     footer = function()
       local stats = require("lazy").stats()
       local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
@@ -140,16 +115,6 @@ api.nvim_create_autocmd("User", {
   pattern = "DashboardLoaded",
   callback = on_dashboard_displayed,
 })
-
--- Create alternative method using the cellular automaton for systems without cmatrix
-api.nvim_create_user_command("DashboardMatrix", function()
-  -- Check if cellular-automaton.nvim is loaded
-  if pcall(require, "cellular-automaton") then
-    vim.cmd("CellularAutomaton make_it_rain")
-  else
-    vim.notify("cellular-automaton.nvim is not installed", vim.log.levels.WARN)
-  end
-end, {})
 
 -- Create a command to refresh the dashboard, cmatrix, and Telescope
 api.nvim_create_user_command("RefreshDashboard", function()
