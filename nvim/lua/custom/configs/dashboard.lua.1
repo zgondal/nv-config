@@ -142,4 +142,15 @@ api.nvim_create_user_command("RefreshDashboard", function()
   on_dashboard_displayed()
 end, {})
 
+-- Add keymap to load session
 vim.api.nvim_buf_set_keymap(0, 'n', 'sr', ':SessionRestore<CR>', { noremap = true, silent = true })
+
+-- Refresh dashboard after closing Telescope
+vim.api.nvim_create_autocmd("User", {
+  group = augroup,
+  pattern = "TelescopeClose",
+  callback = function()
+    vim.cmd("Dashboard")
+    on_dashboard_displayed()
+  end,
+})

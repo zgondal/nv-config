@@ -27,7 +27,7 @@ local function create_cmatrix_term()
 
   -- Start cmatrix in the terminal
   -- vim.fn.termopen("cmatrix -b")
-  vim.fn.termopen("rusty-rain -C 0,212,0 -c jap -s")
+  vim.fn.termopen("rusty-rain -C 0,249,0 -c jap -s")
   -- vim.fn.termopen("rusty-rain -C 0,199,0 -c alpha-num -S 60,80 -s")
 
   -- Set the terminal to non-modifiable and disable cursor
@@ -53,11 +53,10 @@ dashboard.setup({
     project = { enable = false },    -- Disable project stats
     mru = { enable = true, cwd_only = true },        -- Disable default recent files
     shortcut = {},
-    shortcut_type = 'number',
+    shortcut_type = { 'number' },
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
-      "", "", "", "", "", "", "", "", "", "", "", "",
       "", "", "", "", "", "", "", "", "", "", "", "",
       "", "", "", "", "", "", "", "", "", "", "", "",
     },
@@ -137,3 +136,13 @@ end, {})
 
 -- Add keymap to load session
 vim.api.nvim_buf_set_keymap(0, 'n', 'sr', ':SessionRestore<CR>', { noremap = true, silent = true })
+
+-- Refresh dashboard after closing Telescope
+vim.api.nvim_create_autocmd("User", {
+  group = augroup,
+  pattern = "TelescopeClose",
+  callback = function()
+    vim.cmd("Dashboard")
+    on_dashboard_displayed()
+  end,
+})
