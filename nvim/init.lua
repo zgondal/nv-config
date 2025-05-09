@@ -405,9 +405,17 @@ vim.schedule(function()
   require "mappings"
 end)
 
--- vim.api.nvim_create_autocmd("User", {
---   pattern = "ToggleMyPrompt",
---   callback = function() require("avante.config").override({ system_prompt = require("custom.system_prompt.avanterules") }) end,
--- })
---
--- vim.keymap.set("n", "<leader>am", function() vim.api.nvim_exec_autocmds("User", {pattern = "ToggleMyPrompt"}) end, { desc = "avante: toggle my prompt"})
+-- Read the system prompt file
+local system_prompt_path = vim.fn.expand('~/.config/nvim/lua/custom/system_prompt.avanterules')
+local jailbreak_prompt_path = vim.fn.expand('~/.config/nvim/lua/custom/jailbreak_prompt.avanterules')
+local system_prompt_content = vim.fn.readfile(system_prompt_path)
+local jailbreak_prompt_content = vim.fn.readfile(jailbreak_prompt_path)
+local system_prompt = table.concat(system_prompt_content, '\n')
+local jailbreak_prompt = table.concat(jailbreak_prompt_content, '\n')
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "ToggleMyPrompt",
+  callback = function() require("avante.config").override({ system_prompt = system_prompt}) end,
+})
+
+vim.keymap.set("n", "<leader>am", function() vim.api.nvim_exec_autocmds("User", {pattern = "ToggleMyPrompt"}) end, { desc = "avante: toggle my prompt"})

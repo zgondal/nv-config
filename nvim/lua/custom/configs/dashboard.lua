@@ -27,7 +27,7 @@ local function create_cmatrix_term()
 
   -- Start cmatrix in the terminal
   -- vim.fn.termopen("cmatrix -b")
-  vim.fn.termopen("rusty-rain -C 0,212,0 -c jap -s")
+  vim.fn.termopen("rusty-rain -C 0,249,0 -c jap -s")
   -- vim.fn.termopen("rusty-rain -C 0,199,0 -c alpha-num -S 60,80 -s")
 
   -- Set the terminal to non-modifiable and disable cursor
@@ -44,36 +44,6 @@ end
 -- Store the cmatrix terminal information
 local cmatrix_term = nil
 
-local function get_recent_files()
-  local oldfiles = vim.v.oldfiles or {}
-  local recent_files = {}
-  local count = 0
-  local project_root = vim.fn.getcwd()
-
-  for _, file in ipairs(oldfiles) do
-    -- Filter out non-file entries and system files
-    if file:match("^%a") and not file:match("^/tmp") and vim.fn.filereadable(file) == 1 and vim.fn.fnamemodify(file, ":h"):find(project_root, 1, true) == 1 then
-      -- Format the filename for display
-      local relative_path = vim.fn.fnamemodify(file, ":~:.")
-      local basename = vim.fn.fnamemodify(file, ":t")
-      local shortdir = vim.fn.pathshorten(vim.fn.fnamemodify(relative_path, ":h"))
-
-      -- Create a dashboard-compatible item
-      table.insert(recent_files, {
-        icon = "  ",
-        desc = string.format("%-25s (%s)", basename, shortdir),
-        key = #recent_files + 1,
-        action = "edit " .. vim.fn.fnameescape(file)
-      })
-
-      count = count + 1
-      if count >= 6 then break end -- Limit to 6 recent files
-    end
-  end
-
-  return recent_files
-end
-
 -- Setup dashboard with dynamic center section
 dashboard.setup({
   theme = 'hyper',
@@ -83,74 +53,15 @@ dashboard.setup({
     project = { enable = false },    -- Disable project stats
     mru = { enable = true, cwd_only = true },        -- Disable default recent files
     shortcut = {},
-    shortcut_type = 'number',
+    shortcut_type = { 'number' },
     header = {
       "", "", "", "", "", "", "",
       -- The cmatrix will be displayed above this empty space
       "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "",
     },
-    -- Create center section with recent files and standard actions
-    center = function()
-      local center_items = {}
-      local recent_files = get_recent_files()
-
-      -- Recent Files Section
-      if #recent_files > 0 then
-        table.insert(center_items, { 
-          icon = " ",
-          desc = "Recent Files in " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~"),
-          key = "R",
-          action = "lua require('telescope.builtin').oldfiles()"
-        })
-
-        for _, item in ipairs(recent_files) do
-          table.insert(center_items, item)
-        end
-
-        table.insert(center_items, { icon = "", desc = "", key = "" })
-      end
-
-      -- Standard Actions
-      local actions = {
-        {
-          icon = " ",
-          desc = "Find File                      ",
-          key = "F",
-          action = "lua require('telescope.builtin').find_files()"
-        },
-        {
-          icon = " ",
-          desc = "Find Text                      ",
-          key = "G",
-          action = "lua require('telescope.builtin').live_grep()"
-        },
-        {
-          icon = " ",
-          desc = "New File                       ",
-          key = "N",
-          action = "enew"
-        },
-        {
-          icon = " ",
-          desc = "Quit Neovim                    ",
-          key = "Q",
-          action = "qa"
-        }
-      }
-
-      table.insert(center_items, {
-        icon = " ",
-        desc = "Workspace Actions",
-        key = "A",
-        action = ""
-      })
-
-      for _, action in ipairs(actions) do
-        table.insert(center_items, action)
-      end
-
-      return center_items
-    end,
 
     footer = function()
       local stats = require("lazy").stats()
