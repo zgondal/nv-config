@@ -1,0 +1,43 @@
+# font-family = SpaceMonoNerdFontMono
+#font-family = SpaceMono Nerd Font Mono Bold
+# font-family = VictorMonoNerdFontMono
+#font-family = CaskaydiaCove Nerd Font Mono
+#font-family = Mononoki
+#font-family = Hasklig
+#font-family = Hasklig Medium
+#font-family = CMU Typewriter Text Bold
+#font-family = CMU Typewriter Text
+#font-family = CMU Bright Roman
+#font-family = CMU Concrete Roman
+#font-family = Noto Mono
+#font-family = Iosevka
+font-family = Iosevka Medium Extended
+#font-family = Iosevka
+#font-style = Bold
+#font-family = Victor Mono
+#font-family = Victor Mono Bold
+#font-family = Victor Mono Medium
+#font-family = 0xProto
+#font-family = 0xProto Bold
+#font-family = Consolas Nerd Font Mono
+#theme = Dark Pastel
+theme = iTerm2 Default
+#theme = Mathias
+#theme = PaulMillr
+#theme = Pro
+#theme = RetroLegends
+#theme = Symfonic
+#theme = catppuccin-mocha
+background-opacity = .86
+font-size = 13
+
+gtk-titlebar = true
+
+#Window settings
+#window-decoration = false
+window-inherit-working-directory = true
+window-theme = dark
+window-save-state = always
+#window-width = 1280
+#window-height = 720
+
